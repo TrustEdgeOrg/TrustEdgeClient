@@ -12,6 +12,7 @@ from trustedge_wg.cli import CliConfig, parse_cli, usage_text
 from trustedge_wg.constants import CACHED_WG_CONF_PERM
 from trustedge_wg.enroll.api import Client, EnrollRequest, wireguard_from_enroll
 from trustedge_wg.enroll.public_ip import fetch_public_ipv4
+from trustedge_wg.server_config import apply_server_config, fetch_server_config
 from trustedge_wg.wireguard.config import load_config, render_wireguard_conf
 from trustedge_wg.platform.trust_ca import install_policy_ca_if_requested
 from trustedge_wg.wireguard.tunnel import normalize_endpoint, run_tunnel
@@ -88,6 +89,8 @@ def _shutdown_event():
 
 
 def run(opts: CliConfig) -> None:
+    if opts.api_url.strip() and not opts.config_path.strip():
+        opts = apply_server_config(opts, fetch_server_config(opts.api_url))
     cfg = resolve_wireguard_config(opts)
     _ = normalize_endpoint(cfg.endpoint)
     device_id = ""

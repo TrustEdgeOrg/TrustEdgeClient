@@ -11,6 +11,7 @@ from rumps import events
 
 from trustedge_wg.cli import CliConfig
 from trustedge_wg.constants import DEFAULT_STATS_INTERVAL
+from trustedge_wg.server_config import apply_server_config
 from trustedge_wg.gui.connection_panel import refresh_connection_panel, show_connection_panel
 from trustedge_wg.gui.connection_view import (
     ConnectionSnapshot,
@@ -94,13 +95,17 @@ class TrustEdgeMenuBarApp(rumps.App):
         refresh_connection_panel(snapshot)
 
     def _cli_config(self) -> CliConfig:
-        return CliConfig(
+        base = CliConfig(
             api_url=self.settings.api_url,
             api_token=self.settings.api_token,
             apply_dns=True,
             install_policy_ca=self.settings.install_policy_ca,
             stats_interval=DEFAULT_STATS_INTERVAL,
         )
+        server = self.settings.fetch_server_config()
+        if server is None:
+            return base
+        return apply_server_config(base, server)
 
     @rumps.timer(2)
     def poll_status(self, _: rumps.Timer) -> None:

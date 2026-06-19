@@ -53,6 +53,7 @@ def usage_text() -> str:
   API:      trustedge-wg [--api-url URL] [--api-token TOKEN] [--state PATH] [--config-out PATH]
 
   Default API URL: {api_default}
+  Enroll credentials and paths are fetched from GET /v1/client-config when using --api-url.
   Override via --api-url, {ENV_API_URL} in Application Support/.env, or GUI Settings
 """
 
@@ -66,7 +67,7 @@ def parse_cli(argv: list[str] | None = None) -> CliConfig:
     )
     p.add_argument("--config", default="", help="WireGuard .conf (offline; ignores --api-url)")
     p.add_argument("--api-url", default=env.api_url(), help="TrustEdge API base URL")
-    p.add_argument("--api-token", default=env.api_token(), help="Bearer token (enroll bootstrap)")
+    p.add_argument("--api-token", default="", help="Optional Bearer token override for enroll bootstrap")
     p.add_argument("--api-enroll-path", default=DEFAULT_ENROLL_PATH, help="Enroll path")
     p.add_argument("--state", default="", help="Agent state JSON path")
     p.add_argument("--config-out", default="", help="Write merged .conf after enroll")

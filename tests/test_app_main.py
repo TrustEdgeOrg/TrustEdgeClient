@@ -10,6 +10,7 @@ from trustedge_wg.agent.state import AgentState
 from trustedge_wg.app.main import main, resolve_wireguard_config, run
 from trustedge_wg.cli import CliConfig
 from trustedge_wg.constants import CACHED_WG_CONF_PERM
+from trustedge_wg.server_config import ServerConfig
 from trustedge_wg.wireguard.config import parse_wireguard_config, render_wireguard_conf
 from tests.helpers import mock_urlopen_response
 
@@ -66,7 +67,11 @@ def test_resolve_wireguard_config_enroll_integration(
         config_out=str(config_out),
     )
 
+    server_cfg = ServerConfig(enroll_bootstrap_token="bootstrap-token")
+
     with (
+        patch("trustedge_wg.app.main.fetch_server_config", return_value=server_cfg),
+        patch("trustedge_wg.app.main.apply_server_config", side_effect=lambda o, _s: o),
         patch("trustedge_wg.enroll.api.urlopen", return_value=mock_urlopen_response(enroll_body)),
         patch("trustedge_wg.app.main.fetch_public_ipv4", return_value="203.0.113.10"),
     ):
