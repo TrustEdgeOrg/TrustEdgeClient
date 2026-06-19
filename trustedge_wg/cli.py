@@ -47,13 +47,13 @@ class CliConfig:
 
 
 def usage_text() -> str:
-    api_default = env.api_url() or f"(set {ENV_API_URL} in .env)"
+    api_default = env.api_url() or f"(set {ENV_API_URL} in Application Support/.env)"
     return f"""usage:
   Offline:  trustedge-wg --config /path/to/client.conf [--no-routing]
   API:      trustedge-wg [--api-url URL] [--api-token TOKEN] [--state PATH] [--config-out PATH]
 
   Default API URL: {api_default}
-  Override via --api-url, {ENV_API_URL} in .env, or GUI Settings
+  Override via --api-url, {ENV_API_URL} in Application Support/.env, or GUI Settings
 """
 
 

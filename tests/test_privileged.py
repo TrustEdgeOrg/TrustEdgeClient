@@ -19,7 +19,7 @@ from trustedge_wg.gui.privileged import (
 def test_build_tunnel_argv_api_mode(tmp_user_data, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         "trustedge_wg.gui.privileged._python_command",
-        lambda: ["/usr/bin/python3", "-m", "trustedge_wg"],
+        lambda: ["/Applications/TrustEdge.app/Contents/MacOS/trustedge-wg"],
     )
     monkeypatch.setattr(
         "trustedge_wg.gui.privileged.agent_state_path",
@@ -32,7 +32,7 @@ def test_build_tunnel_argv_api_mode(tmp_user_data, monkeypatch: pytest.MonkeyPat
         install_policy_ca=True,
     )
     argv = build_tunnel_argv(opts)
-    assert argv[:3] == ["/usr/bin/python3", "-m", "trustedge_wg"]
+    assert argv[0] == "/Applications/TrustEdge.app/Contents/MacOS/trustedge-wg"
     assert "--api-url" in argv
     assert "https://api.example.com" in argv
     assert "--api-token" in argv
@@ -86,6 +86,8 @@ def test_pid_alive_current_process() -> None:
     assert _pid_alive(2_000_000_000) is False
 
 
-def test_tunnel_pgrep_patterns_dev_mode(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delattr(sys, "frozen", raising=False)
-    assert _tunnel_pgrep_patterns() == ["trustedge-wg", "wireguard-go"]
+def test_tunnel_pgrep_patterns() -> None:
+    assert _tunnel_pgrep_patterns() == [
+        "TrustEdge.app/Contents/MacOS/trustedge-wg",
+        "TrustEdge.app/Contents/MacOS/wireguard-go",
+    ]

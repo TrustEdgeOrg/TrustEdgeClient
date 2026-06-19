@@ -6,21 +6,16 @@ The **trustedge-wg** command-line client is for power users, Linux/Windows, auto
 
 ## Install
 
-```bash
-make install          # macOS / Linux / Windows (Python)
-# or use the binary from make build-mac → dist/trustedge-wg
-```
+Use the binary shipped with `TrustEdge.app` (`Contents/MacOS/trustedge-wg`) or from a release build (`dist/trustedge-wg`).
 
 ---
 
 ## API enroll (recommended)
 
-No WireGuard config file needed. Set your server in `.env` or pass flags:
+No WireGuard config file needed. Set your server in the production `.env` file or pass flags:
 
 ```bash
-cp .env.example .env
-# edit TRUSTEDGE_API_URL and optional TRUSTEDGE_API_TOKEN
-
+# macOS: ~/Library/Application Support/TrustEdgeClient/.env
 sudo trustedge-wg --api-url https://your-api.example.com
 ```
 
@@ -99,4 +94,3 @@ sudo trustedge-wg --api-url https://your-api.example.com --install-policy-ca
 ## Related docs
 
 - [README](../README.md) — TrustEdge.app for Mac users
-- [BUILD.md](BUILD.md) — build, test, develop

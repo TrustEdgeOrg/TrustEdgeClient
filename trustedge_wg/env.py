@@ -8,14 +8,6 @@ from trustedge_wg.constants import ENV_API_TOKEN, ENV_API_URL
 _loaded = False
 
 
-def _find_project_root() -> Path | None:
-    here = Path(__file__).resolve().parent
-    for parent in (here, *here.parents):
-        if (parent / "pyproject.toml").is_file():
-            return parent
-    return None
-
-
 def _load_dotenv_file(path: Path, *, override: bool = False) -> None:
     if not path.is_file():
         return
@@ -46,9 +38,6 @@ def load_dotenv() -> None:
     global _loaded
     if _loaded:
         return
-    root = _find_project_root()
-    if root is not None:
-        _load_dotenv_file(root / ".env", override=False)
     try:
         from trustedge_wg.paths import user_data_dir
 

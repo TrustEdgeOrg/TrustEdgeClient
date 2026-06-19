@@ -38,20 +38,9 @@ Click **Connect** and the app:
 
 ### 1. Get TrustEdge.app
 
-**From a release** — download `TrustEdge.app` from [GitHub Releases](https://github.com/TrustEdgeOrg/TrustEdgeClient/releases) and copy it to **Applications**.
-
-**Or build it yourself** (requires Xcode command-line tools and Python 3.9+):
-
-```bash
-git clone https://github.com/TrustEdgeOrg/TrustEdgeClient.git
-cd TrustEdgeClient
-make build-mac
-cp -R dist/TrustEdge.app /Applications/
-```
+Download `TrustEdge.app` from [GitHub Releases](https://github.com/TrustEdgeOrg/TrustEdgeClient/releases) and copy it to **Applications**.
 
 > **First launch:** if macOS blocks the app, right-click **TrustEdge.app** → **Open**.
-
-See [docs/BUILD.md](docs/BUILD.md) for build details and troubleshooting.
 
 ---
 
@@ -82,7 +71,7 @@ Leave `TRUSTEDGE_API_TOKEN` empty unless your admin gave you a token.
 2. Click the menu bar icon
 3. Click **Connect**
 
-macOS will ask for your password — that’s normal. The VPN needs admin access to start.
+macOS will ask for your password — that's normal. The VPN needs admin access to start.
 
 ---
 
@@ -97,9 +86,9 @@ When connected you can see:
 - Your **VPN IP address**
 - **Gateway** and DNS info
 - **Live upload / download** speeds
-- How long you’ve been connected
+- How long you've been connected
 
-Click **Disconnect** when you’re done.
+Click **Disconnect** when you're done.
 
 ---
 
@@ -137,13 +126,11 @@ sequenceDiagram
 
 | Problem | What to do |
 |---------|------------|
-| “No API URL configured” | Create the `.env` file in step 2 with `TRUSTEDGE_API_URL` |
+| "No API URL configured" | Create the `.env` file in step 2 with `TRUSTEDGE_API_URL` |
 | macOS asks for password | Expected — allow it so the tunnel can start |
-| App won’t open (security warning) | Right-click **TrustEdge.app** → **Open** |
+| App won't open (security warning) | Right-click **TrustEdge.app** → **Open** |
 | Stuck / already connected | Quit the app, click **Disconnect**, then reconnect |
 | No traffic on dashboard | Disconnect and connect once more |
-
-More help: [docs/BUILD.md](docs/BUILD.md#troubleshooting-build)
 
 ---
 
@@ -151,7 +138,6 @@ More help: [docs/BUILD.md](docs/BUILD.md#troubleshooting-build)
 
 | Doc | For |
 |-----|-----|
-| [docs/BUILD.md](docs/BUILD.md) | Building the app, running from source, tests |
 | [docs/CLI.md](docs/CLI.md) | Command-line client (`trustedge-wg`) for admins and scripts |
 
 ---
