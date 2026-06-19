@@ -17,14 +17,12 @@ from trustedge_wg.paths import agent_state_path
 
 
 def _python_command() -> list[str]:
-    if getattr(sys, "frozen", False):
-        from trustedge_wg.platform.bundled import find_sibling_binary
+    from trustedge_wg.platform.bundled import find_sibling_binary
 
-        cli = find_sibling_binary("trustedge-wg")
-        if cli:
-            return [cli]
-        return [sys.executable]
-    return [sys.executable, "-m", "trustedge_wg"]
+    cli = find_sibling_binary("trustedge-wg")
+    if cli:
+        return [cli]
+    return [sys.executable]
 
 
 def build_tunnel_argv(opts: CliConfig) -> list[str]:
@@ -108,12 +106,10 @@ def _log_shows_tunnel_up(lines: list[str] | None = None) -> bool:
 
 
 def _tunnel_pgrep_patterns() -> list[str]:
-    if getattr(sys, "frozen", False):
-        return [
-            "TrustEdge.app/Contents/MacOS/trustedge-wg",
-            "TrustEdge.app/Contents/MacOS/wireguard-go",
-        ]
-    return ["trustedge-wg", "wireguard-go"]
+    return [
+        "TrustEdge.app/Contents/MacOS/trustedge-wg",
+        "TrustEdge.app/Contents/MacOS/wireguard-go",
+    ]
 
 
 def _pgrep_pids(*extra: str) -> list[int]:
@@ -124,11 +120,7 @@ def _pgrep_pids(*extra: str) -> list[int]:
         except ValueError:
             continue
     for pattern in _tunnel_pgrep_patterns():
-        if getattr(sys, "frozen", False):
-            cmd = ["pgrep", "-f", pattern]
-        else:
-            cmd = ["pgrep", "-x", pattern]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(["pgrep", "-f", pattern], capture_output=True, text=True)
         if result.returncode != 0:
             continue
         for line in result.stdout.splitlines():
@@ -227,8 +219,7 @@ def stop_tunnel() -> tuple[bool, str]:
 
     pid_path = shlex.quote(str(pid_file()))
     log_path = shlex.quote(str(log_file()))
-    if getattr(sys, "frozen", False):
-        match_block = """
+    match_block = """
 for _PATTERN in TrustEdge.app/Contents/MacOS/trustedge-wg TrustEdge.app/Contents/MacOS/wireguard-go; do
   for _PID in $(pgrep -f "$_PATTERN" 2>/dev/null); do
     kill -TERM "$_PID" 2>/dev/null
@@ -245,20 +236,6 @@ for _PATTERN in TrustEdge.app/Contents/MacOS/trustedge-wg TrustEdge.app/Contents
     kill -KILL "$_PID" 2>/dev/null
     pkill -KILL -P "$_PID" 2>/dev/null
   done
-done
-"""
-    else:
-        match_block = """
-for _NAME in trustedge-wg wireguard-go; do
-  killall -TERM "$_NAME" 2>/dev/null
-done
-for _ in $(seq 1 40); do
-  pgrep -x trustedge-wg >/dev/null 2>&1 && sleep 0.5 && continue
-  pgrep -x wireguard-go >/dev/null 2>&1 && sleep 0.5 && continue
-  break
-done
-for _NAME in trustedge-wg wireguard-go; do
-  killall -KILL "$_NAME" 2>/dev/null
 done
 """
     script = f"""
