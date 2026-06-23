@@ -14,6 +14,7 @@ from trustedge_wg.wireguard.config import (
     render_wireguard_conf,
 )
 from trustedge_wg.constants import (
+    DEFAULT_ATTRIBUTION_PATH,
     DEFAULT_ENROLL_PATH,
     DEFAULT_POLICY_CA_PATH,
     DEFAULT_USAGE_PATH,
@@ -55,6 +56,7 @@ class Client:
         device_token: str = "",
         enroll_path: str = DEFAULT_ENROLL_PATH,
         usage_path: str = DEFAULT_USAGE_PATH,
+        attribution_path: str = DEFAULT_ATTRIBUTION_PATH,
         policy_ca_path: str = DEFAULT_POLICY_CA_PATH,
     ) -> None:
         base_url = base_url.strip().rstrip("/")
@@ -68,6 +70,10 @@ class Client:
             usage_path = DEFAULT_USAGE_PATH
         if not usage_path.startswith("/"):
             usage_path = "/" + usage_path
+        if not attribution_path:
+            attribution_path = DEFAULT_ATTRIBUTION_PATH
+        if not attribution_path.startswith("/"):
+            attribution_path = "/" + attribution_path
         if not policy_ca_path.startswith("/"):
             policy_ca_path = "/" + policy_ca_path
         self.base_url = base_url
@@ -75,6 +81,7 @@ class Client:
         self.device_token = device_token.strip()
         self.enroll_path = enroll_path
         self.usage_path = usage_path
+        self.attribution_path = attribution_path
         self.policy_ca_path = policy_ca_path
 
     def fetch_block_page_ca(self) -> bytes:
@@ -136,6 +143,39 @@ class Client:
             ) from e
         except URLError as e:
             raise RuntimeError(f"trustedge api: usage round trip: {e}") from e
+
+    def report_network_attribution(
+        self,
+        *,
+        device_id: str,
+        intervals: list[dict],
+    ) -> None:
+        payload = {
+            "device_id": device_id,
+            "intervals": intervals,
+        }
+        data = json.dumps(payload).encode()
+        headers = {"Content-Type": "application/json", **self._auth_header(for_usage=True)}
+        req = Request(
+            self.base_url + self.attribution_path,
+            data=data,
+            method="POST",
+            headers=headers,
+        )
+        try:
+            with urlopen(req, timeout=HTTP_CLIENT_TIMEOUT) as resp:
+                if resp.status < 200 or resp.status >= 300:
+                    body = resp.read(MAX_ENROLL_RESPONSE_BYTES).decode(errors="replace")
+                    raise RuntimeError(
+                        f"network attribution {self.attribution_path} returned {resp.status}: {body}"
+                    )
+        except HTTPError as e:
+            err_body = e.read(MAX_ENROLL_RESPONSE_BYTES).decode(errors="replace").strip()
+            raise RuntimeError(
+                f"trustedge api: network attribution {self.attribution_path} returned {e.code}: {err_body}"
+            ) from e
+        except URLError as e:
+            raise RuntimeError(f"trustedge api: network attribution round trip: {e}") from e
 
     def enroll(self, body: EnrollRequest) -> EnrollResponse:
         payload: dict[str, Any] = {

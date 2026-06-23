@@ -6,6 +6,9 @@ from dataclasses import dataclass
 
 from trustedge_wg import env
 from trustedge_wg.constants import (
+    DEFAULT_ATTRIBUTION_PATH,
+    DEFAULT_ATTRIBUTION_POLL_SEC,
+    DEFAULT_ATTRIBUTION_REPORT_SEC,
     DEFAULT_ENROLL_PATH,
     DEFAULT_POLICY_CA_PATH,
     DEFAULT_STATS_INTERVAL,
@@ -32,6 +35,10 @@ class CliConfig:
     stats_interval: float = 0.0
     stats_file: str = ""
     api_usage_path: str = DEFAULT_USAGE_PATH
+    api_attribution_path: str = DEFAULT_ATTRIBUTION_PATH
+    network_attribution_enabled: bool = True
+    network_attribution_poll_sec: float = DEFAULT_ATTRIBUTION_POLL_SEC
+    network_attribution_report_sec: float = DEFAULT_ATTRIBUTION_REPORT_SEC
     api_policy_ca_path: str = DEFAULT_POLICY_CA_PATH
     install_policy_ca: bool = False
 
@@ -113,6 +120,38 @@ def parse_cli(argv: list[str] | None = None) -> CliConfig:
         help="With --api-url and --stats-interval: POST usage to this path",
     )
     p.add_argument(
+        "--api-attribution-path",
+        default=DEFAULT_ATTRIBUTION_PATH,
+        help="With --api-url: POST network attribution to this path",
+    )
+    if sys.platform == "darwin":
+        p.add_argument(
+            "--network-attribution",
+            action=argparse.BooleanOptionalAction,
+            default=True,
+            help="Report foreground app usage for network attribution (default: on with --api-url)",
+        )
+    else:
+        p.add_argument(
+            "--network-attribution",
+            action="store_true",
+            help="Report foreground app usage (macOS only)",
+        )
+    p.add_argument(
+        "--network-attribution-poll-sec",
+        type=float,
+        default=DEFAULT_ATTRIBUTION_POLL_SEC,
+        metavar="SEC",
+        help="Foreground app poll interval in seconds (default 30)",
+    )
+    p.add_argument(
+        "--network-attribution-report-sec",
+        type=float,
+        default=DEFAULT_ATTRIBUTION_REPORT_SEC,
+        metavar="SEC",
+        help="Network attribution batch report interval in seconds (default 60)",
+    )
+    p.add_argument(
         "--install-policy-ca",
         action="store_true",
         help="macOS: download TrustEdge Policy CA from API and trust it (sudo) for HTTPS block page",
@@ -127,6 +166,9 @@ def parse_cli(argv: list[str] | None = None) -> CliConfig:
     stats_interval = max(0.0, float(args.stats_interval))
     if stats_interval == 0.0 and args.api_url.strip() and not args.config.strip():
         stats_interval = DEFAULT_STATS_INTERVAL
+    network_attribution_enabled = bool(args.network_attribution) and bool(args.api_url.strip())
+    if sys.platform != "darwin":
+        network_attribution_enabled = False
     return CliConfig(
         config_path=args.config,
         api_url=args.api_url,
@@ -141,6 +183,10 @@ def parse_cli(argv: list[str] | None = None) -> CliConfig:
         stats_interval=stats_interval,
         stats_file=args.stats_file,
         api_usage_path=args.api_usage_path,
+        api_attribution_path=args.api_attribution_path,
+        network_attribution_enabled=network_attribution_enabled,
+        network_attribution_poll_sec=max(1.0, float(args.network_attribution_poll_sec)),
+        network_attribution_report_sec=max(5.0, float(args.network_attribution_report_sec)),
         api_policy_ca_path=args.api_policy_ca_path,
         install_policy_ca=args.install_policy_ca,
     )

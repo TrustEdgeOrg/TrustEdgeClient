@@ -21,6 +21,7 @@ from trustedge_wg.platform.routing import apply_full_tunnel_routes
 from trustedge_wg.wireguard.config import WireGuardConfig, render_wireguard_conf
 from trustedge_wg.wireguard.linux_kernel import WG_SOCKET_DIR, linux_kernel_available
 from trustedge_wg.wireguard.monitor import start_traffic_monitor
+from trustedge_wg.network_attribution.monitor import start_network_attribution_monitor
 from trustedge_wg.wireguard.uapi import build_uapi
 
 log = logging.getLogger("trustedge-wg")
@@ -402,11 +403,19 @@ def run_tunnel(
                 device_token=st.device_token,
                 enroll_path=opts.api_enroll_path,
                 usage_path=opts.api_usage_path,
+                attribution_path=opts.api_attribution_path,
             )
 
         start_traffic_monitor(
             cfg,
             tun_name,
+            opts,
+            shutdown_event,
+            device_id=device_id,
+            api_client=api_client,
+        )
+
+        start_network_attribution_monitor(
             opts,
             shutdown_event,
             device_id=device_id,
