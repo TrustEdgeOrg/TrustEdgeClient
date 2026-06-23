@@ -40,11 +40,19 @@ def start_network_attribution_monitor(
         pending: list[dict] = []
         last_report = time.monotonic()
         usage_warned = False
+        foreground_warned = False
 
         while not shutdown_event.wait(poll_sec):
             app = get_foreground_app()
             if app is None:
+                if not foreground_warned:
+                    log.warning(
+                        "foreground app unavailable — network attribution and map need a "
+                        "frontmost app; on macOS grant Accessibility to TrustEdge if prompted"
+                    )
+                    foreground_warned = True
                 continue
+            foreground_warned = False
 
             started_at = datetime.now(timezone.utc)
             pending.append(
