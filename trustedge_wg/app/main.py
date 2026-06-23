@@ -101,6 +101,7 @@ def run(opts: CliConfig) -> None:
             device_token=st.device_token,
             enroll_path=opts.api_enroll_path,
             usage_path=opts.api_usage_path,
+            attribution_path=opts.api_attribution_path,
             policy_ca_path=opts.api_policy_ca_path,
         )
         if opts.stats_interval > 0 and not st.device_token.strip():

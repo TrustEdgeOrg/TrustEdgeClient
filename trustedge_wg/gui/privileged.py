@@ -46,6 +46,12 @@ def build_tunnel_argv(opts: CliConfig) -> list[str]:
         cmd.extend(["--dns-service", opts.dns_service.strip()])
     if opts.stats_interval > 0:
         cmd.extend(["--stats-interval", str(opts.stats_interval)])
+    if not opts.network_attribution_enabled:
+        cmd.append("--no-network-attribution")
+    if opts.network_attribution_poll_sec > 0:
+        cmd.extend(["--network-attribution-poll-sec", str(opts.network_attribution_poll_sec)])
+    if opts.network_attribution_report_sec > 0:
+        cmd.extend(["--network-attribution-report-sec", str(opts.network_attribution_report_sec)])
     if opts.install_policy_ca:
         cmd.append("--install-policy-ca")
     cmd.extend(["--state", str(agent_state_path())])

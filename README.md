@@ -23,6 +23,15 @@ Click **Connect** and the app:
 - Opens an encrypted VPN tunnel
 - Routes DNS through TrustEdge so policy applies to all apps
 - Shows connection status and live traffic
+- Reports **foreground application usage** for network attribution (app name only — no window titles or content)
+
+---
+
+## Privacy (network attribution)
+
+While connected, TrustEdge reports which **application is in the foreground** (e.g. Microsoft Teams, Zoom, Slack) so your admin can attribute DNS activity to an app for security visibility. We do **not** collect window titles, keystrokes, or browsing history.
+
+Disable on the CLI with `--no-network-attribution`.
 
 ---
 
@@ -98,7 +107,7 @@ Click **Disconnect** when you're done.
 2. The app registers your Mac with the TrustEdge server.
 3. The server sends tunnel settings (address, DNS, server key).
 4. The VPN tunnel opens and DNS is pointed at TrustEdge.
-5. Your admin sees live bandwidth for your device on the dashboard.
+5. Your admin sees live bandwidth and per-app usage (network attribution) on the dashboard.
 
 <details>
 <summary><strong>Technical flow</strong></summary>
@@ -116,6 +125,7 @@ sequenceDiagram
     API-->>App: Tunnel settings
     App->>VPN: Open encrypted tunnel
     App->>API: Send usage stats while connected
+    App->>API: Send foreground app intervals (network attribution)
 ```
 
 </details>
