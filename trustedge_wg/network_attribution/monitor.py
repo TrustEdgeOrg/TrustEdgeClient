@@ -40,11 +40,19 @@ def start_network_attribution_monitor(
         pending: list[dict] = []
         last_report = time.monotonic()
         usage_warned = False
+        foreground_warned = False
 
         while not shutdown_event.wait(poll_sec):
             app = get_foreground_app()
             if app is None:
+                if not foreground_warned:
+                    log.warning(
+                        "foreground app unavailable — network attribution and map need a "
+                        "frontmost app (e.g. Chrome, Safari) while connected"
+                    )
+                    foreground_warned = True
                 continue
+            foreground_warned = False
 
             started_at = datetime.now(timezone.utc)
             pending.append(
@@ -69,6 +77,12 @@ def start_network_attribution_monitor(
                 api_client.report_network_attribution(
                     device_id=device_id,
                     intervals=batch,
+                )
+                latest = batch[-1].get("app_name") or batch[-1].get("bundle_id") or "unknown"
+                log.info(
+                    "network attribution reported %d interval(s); latest foreground app: %s",
+                    len(batch),
+                    latest,
                 )
             except Exception as exc:
                 log.warning("network attribution report: %s", exc)
