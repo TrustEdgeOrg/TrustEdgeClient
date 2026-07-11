@@ -48,7 +48,7 @@ def start_network_attribution_monitor(
                 if not foreground_warned:
                     log.warning(
                         "foreground app unavailable — network attribution and map need a "
-                        "frontmost app; on macOS grant Accessibility to TrustEdge if prompted"
+                        "frontmost app (e.g. Chrome, Safari) while connected"
                     )
                     foreground_warned = True
                 continue
@@ -77,6 +77,12 @@ def start_network_attribution_monitor(
                 api_client.report_network_attribution(
                     device_id=device_id,
                     intervals=batch,
+                )
+                latest = batch[-1].get("app_name") or batch[-1].get("bundle_id") or "unknown"
+                log.info(
+                    "network attribution reported %d interval(s); latest foreground app: %s",
+                    len(batch),
+                    latest,
                 )
             except Exception as exc:
                 log.warning("network attribution report: %s", exc)

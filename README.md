@@ -8,14 +8,14 @@
 
 <p align="center">
   <a href="https://github.com/TrustEdgeOrg/TrustEdgeClient">TrustEdgeClient</a> ·
-  <a href="https://github.com/TrustEdgeOrg/TrustEdge">TrustEdge platform</a>
+  <a href="https://github.com/TrustEdgeOrg/TrustEdge">TrustEdge observability platform</a>
 </p>
 
 ---
 
 ## What is this?
 
-**TrustEdge** is a Mac app in your menu bar. It connects your Mac to a [TrustEdge](https://github.com/TrustEdgeOrg/TrustEdge) network — no WireGuard files to manage.
+**TrustEdge** is a Mac app in your menu bar. It connects your Mac to a [TrustEdge](https://github.com/TrustEdgeOrg/TrustEdge) security observability deployment — no WireGuard files to manage.
 
 Click **Connect** and the app:
 
@@ -154,7 +154,7 @@ sequenceDiagram
 
 ## Links
 
-- [TrustEdge platform](https://github.com/TrustEdgeOrg/TrustEdge) — server, dashboard, policy engine
+- [TrustEdge platform](https://github.com/TrustEdgeOrg/TrustEdge) — security observability server, dashboard, detection, and policy
 - [TrustEdgeOrg](https://github.com/TrustEdgeOrg) on GitHub
 
 ---
